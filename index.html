@@ -64,7 +64,21 @@
       color: #58c8ff;
       font-weight: bold;
     }
+    
+     button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 9px;
+      border: 1px solid #58c8ff;
+      border-radius: 7px;
+      color: white;
+      background: #102b42;
+      cursor: pointer;
+    }
 
+button:hover {
+  background: #174668;
+}
     #resultado {
       margin-top: 15px;
       padding: 10px;
@@ -119,11 +133,27 @@
       <input id="velocidade" type="range" min="0" max="100" value="20">
     </label>
 
-    <label>
-      Ângulo do modelo:
-      <span id="anguloValor" class="valor">0°</span>
-      <input id="angulo" type="range" min="-45" max="45" value="0">
-    </label>
+<label>
+  Rotação X:
+  <span id="rotacaoXValor" class="valor">0°</span>
+  <input id="rotacaoX" type="range" min="-180" max="180" value="0">
+</label>
+
+<label>
+  Rotação Y:
+  <span id="rotacaoYValor" class="valor">0°</span>
+  <input id="rotacaoY" type="range" min="-180" max="180" value="0">
+</label>
+
+<label>
+  Rotação Z:
+  <span id="rotacaoZValor" class="valor">0°</span>
+  <input id="rotacaoZ" type="range" min="-180" max="180" value="0">
+</label>
+
+<button id="resetarRotacao" type="button">
+  Centralizar rotação
+</button>
 
     <label>
       Coeficiente de arrasto:
