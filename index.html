@@ -298,7 +298,10 @@ button:hover {
     scene.add(particulas);
 
     const velocidade = document.getElementById("velocidade");
-    const angulo = document.getElementById("angulo");
+    const rotacaoX = document.getElementById("rotacaoX");
+    const rotacaoY = document.getElementById("rotacaoY");
+    const rotacaoZ = document.getElementById("rotacaoZ");
+    const resetarRotacao = document.getElementById("resetarRotacao");
     const cd = document.getElementById("cd");
     const area = document.getElementById("area");
 
@@ -319,8 +322,14 @@ button:hover {
       document.getElementById("velocidadeValor").textContent =
         `${v} m/s`;
 
-      document.getElementById("anguloValor").textContent =
-        `${angulo.value}°`;
+      document.getElementById("rotacaoXValor").textContent =
+  `${rotacaoX.value}°`;
+
+      document.getElementById("rotacaoYValor").textContent =
+  `${rotacaoY.value}°`;
+
+      document.getElementById("rotacaoZValor").textContent =
+  `${rotacaoZ.value}°`;
 
       document.getElementById("cdValor").textContent =
         coeficiente.toFixed(2).replace(".", ",");
@@ -332,13 +341,28 @@ button:hover {
         forca.toFixed(2).replace(".", ",");
 
       if (modelo) {
+        modelo.rotation.x =
+          -Math.PI / 2 +
+      THREE.MathUtils.degToRad(Number(rotacaoX.value));
+
+        modelo.rotation.y =
+      THREE.MathUtils.degToRad(Number(rotacaoY.value));
+
         modelo.rotation.z =
-          THREE.MathUtils.degToRad(Number(angulo.value));
-      }
-    }
+      THREE.MathUtils.degToRad(Number(rotacaoZ.value));
+}
 
     velocidade.addEventListener("input", atualizarCalculos);
-    angulo.addEventListener("input", atualizarCalculos);
+ rotacaoX.addEventListener("input", atualizarCalculos);
+rotacaoY.addEventListener("input", atualizarCalculos);
+rotacaoZ.addEventListener("input", atualizarCalculos);
+
+resetarRotacao.addEventListener("click", function () {
+  rotacaoX.value = 0;
+  rotacaoY.value = 0;
+  rotacaoZ.value = 0;
+  atualizarCalculos();
+});
     cd.addEventListener("input", atualizarCalculos);
     area.addEventListener("input", atualizarCalculos);
 
