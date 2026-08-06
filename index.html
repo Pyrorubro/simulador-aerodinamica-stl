@@ -349,8 +349,11 @@ button:hover {
       THREE.MathUtils.degToRad(Number(rotacaoY.value));
 
         modelo.rotation.z =
-      THREE.MathUtils.degToRad(Number(rotacaoZ.value));
-}
+          THREE.MathUtils.degToRad(Number(rotacaoZ.value));
+      }
+    }
+
+    velocidade.addEventListener("input", atualizarCalculos);
 
     velocidade.addEventListener("input", atualizarCalculos);
  rotacaoX.addEventListener("input", atualizarCalculos);
