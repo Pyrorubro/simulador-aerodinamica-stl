@@ -3,180 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Simulador de Aerodinâmica STL</title>
-
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      color: white;
-      background: #07111f;
-    }
-
-    #painel {
-      position: absolute;
-      z-index: 10;
-      top: 15px;
-      left: 15px;
-      width: 280px;
-      padding: 18px;
-      border: 1px solid #315574;
-      border-radius: 12px;
-      background: rgba(7, 17, 31, 0.92);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-    }
-
-    h1 {
-      margin: 0 0 8px;
-      color: #58c8ff;
-      font-size: 20px;
-    }
-
-    p {
-      margin: 0 0 14px;
-      color: #b8c8d8;
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-    label {
-      display: block;
-      margin-top: 13px;
-      font-size: 13px;
-    }
-
-    input[type="file"] {
-      width: 100%;
-      margin-top: 6px;
-    }
-
-    input[type="range"] {
-      width: 100%;
-    }
-
-    .valor {
-      color: #58c8ff;
-      font-weight: bold;
-    }
-    
-     button {
-      width: 100%;
-      margin-top: 14px;
-      padding: 9px;
-      border: 1px solid #58c8ff;
-      border-radius: 7px;
-      color: white;
-      background: #102b42;
-      cursor: pointer;
-    }
-
-button:hover {
-  background: #174668;
-}
-    #resultado {
-      margin-top: 15px;
-      padding: 10px;
-      border-radius: 8px;
-      background: #10253a;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    #aviso {
-      position: absolute;
-      right: 15px;
-      bottom: 15px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.55);
-      color: #c8d4df;
-      font-size: 12px;
-    }
-
-    canvas {
-      display: block;
-    }
+    * { box-sizing: border-box; }
+    body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; color: white; background: #07111f; }
+    #painel { position: absolute; z-index: 10; top: 15px; left: 15px; width: 290px; max-height: calc(100vh - 30px); overflow-y: auto; padding: 18px; border: 1px solid #315574; border-radius: 12px; background: rgba(7,17,31,.92); box-shadow: 0 8px 30px rgba(0,0,0,.4); }
+    h1 { margin: 0 0 8px; color: #58c8ff; font-size: 20px; }
+    p { margin: 0 0 14px; color: #b8c8d8; font-size: 13px; line-height: 1.4; }
+    label { display: block; margin-top: 13px; font-size: 13px; }
+    input[type="file"], input[type="range"] { width: 100%; margin-top: 6px; }
+    .valor { color: #58c8ff; font-weight: bold; }
+    button { width: 100%; margin-top: 14px; padding: 9px; border: 1px solid #58c8ff; border-radius: 7px; color: white; background: #102b42; cursor: pointer; }
+    button:hover { background: #174668; }
+    #resultado { margin-top: 15px; padding: 10px; border-radius: 8px; background: #10253a; font-size: 14px; line-height: 1.6; }
+    #status { margin-top: 8px; color: #8fdcff; font-size: 12px; }
+    #aviso { position: absolute; right: 15px; bottom: 15px; padding: 8px 12px; border-radius: 8px; background: rgba(0,0,0,.55); color: #c8d4df; font-size: 12px; }
+    canvas { display: block; }
+    @media (max-width: 600px) { #painel { width: min(270px, calc(100vw - 30px)); } #aviso { display: none; } }
   </style>
-
   <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
-      }
-    }
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}
   </script>
 </head>
-
 <body>
   <div id="painel">
     <h1>Aerodinâmica STL</h1>
-
-    <p>
-      Carregue um modelo STL para visualizar o objeto em um fluxo de ar.
-    </p>
-
-    <label>
-      Arquivo STL:
-      <input id="arquivoSTL" type="file" accept=".stl">
-    </label>
-
-    <label>
-      Velocidade do ar:
-      <span id="velocidadeValor" class="valor">20 m/s</span>
-      <input id="velocidade" type="range" min="0" max="100" value="20">
-    </label>
-
-<label>
-  Rotação X:
-  <span id="rotacaoXValor" class="valor">0°</span>
-  <input id="rotacaoX" type="range" min="-180" max="180" value="0">
-</label>
-
-<label>
-  Rotação Y:
-  <span id="rotacaoYValor" class="valor">0°</span>
-  <input id="rotacaoY" type="range" min="-180" max="180" value="0">
-</label>
-
-<label>
-  Rotação Z:
-  <span id="rotacaoZValor" class="valor">0°</span>
-  <input id="rotacaoZ" type="range" min="-180" max="180" value="0">
-</label>
-
-<button id="resetarRotacao" type="button">
-  Centralizar rotação
-</button>
-
-    <label>
-      Coeficiente de arrasto:
-      <span id="cdValor" class="valor">0,50</span>
-      <input id="cd" type="range" min="0.05" max="2" value="0.5" step="0.05">
-    </label>
-
-    <label>
-      Área frontal:
-      <span id="areaValor" class="valor">0,010 m²</span>
-      <input id="area" type="range" min="0.001" max="0.2" value="0.01" step="0.001">
-    </label>
-
-    <div id="resultado">
-      Força de arrasto:
-      <strong><span id="forca">1,23</span> N</strong>
-    </div>
+    <p>Carregue um STL para visualizar o desvio aproximado do ar e a esteira.</p>
+    <label>Arquivo STL:<input id="arquivoSTL" type="file" accept=".stl"></label>
+    <label>Velocidade do ar: <span id="velocidadeValor" class="valor">20 m/s</span><input id="velocidade" type="range" min="0" max="100" value="20"></label>
+    <label>Rotação X: <span id="rotacaoXValor" class="valor">0°</span><input id="rotacaoX" type="range" min="-180" max="180" value="0"></label>
+    <label>Rotação Y: <span id="rotacaoYValor" class="valor">0°</span><input id="rotacaoY" type="range" min="-180" max="180" value="0"></label>
+    <label>Rotação Z: <span id="rotacaoZValor" class="valor">0°</span><input id="rotacaoZ" type="range" min="-180" max="180" value="0"></label>
+    <button id="resetarRotacao" type="button">Centralizar rotação</button>
+    <label>Desvio do fluxo: <span id="desvioValor" class="valor">100%</span><input id="desvio" type="range" min="0" max="180" value="100"></label>
+    <label>Turbulência da esteira: <span id="turbulenciaValor" class="valor">35%</span><input id="turbulencia" type="range" min="0" max="100" value="35"></label>
+    <label>Coeficiente de arrasto: <span id="cdValor" class="valor">0,50</span><input id="cd" type="range" min="0.05" max="2" value="0.5" step="0.05"></label>
+    <label>Área frontal: <span id="areaValor" class="valor">0,010 m²</span><input id="area" type="range" min="0.001" max="0.2" value="0.01" step="0.001"></label>
+    <div id="resultado">Força de arrasto: <strong><span id="forca">1,23</span> N</strong><div id="status">Fluxo uniforme — carregue um STL.</div></div>
   </div>
-
-  <div id="aviso">
-    Arraste para girar • Role para aproximar
-  </div>
-
+  <div id="aviso">Arraste para girar a câmera • Role para aproximar</div>
   <script type="module">
     import * as THREE from "three";
     import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -184,262 +49,157 @@ button:hover {
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x07111f);
-
-    const camera = new THREE.PerspectiveCamera(
-      45,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-
+    const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 1000);
     camera.position.set(8, 5, 9);
-
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true
-    });
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     document.body.appendChild(renderer.domElement);
-
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-
     scene.add(new THREE.AmbientLight(0xffffff, 1.4));
-
     const luzPrincipal = new THREE.DirectionalLight(0xffffff, 3);
     luzPrincipal.position.set(5, 8, 6);
     scene.add(luzPrincipal);
-
     const luzAzul = new THREE.DirectionalLight(0x38bdf8, 2);
     luzAzul.position.set(-5, 2, -5);
     scene.add(luzAzul);
-
     const grade = new THREE.GridHelper(20, 20, 0x315574, 0x17324a);
     grade.position.y = -2.5;
     scene.add(grade);
 
+    const el = id => document.getElementById(id);
+    const velocidade = el("velocidade"), rotacaoX = el("rotacaoX"), rotacaoY = el("rotacaoY"), rotacaoZ = el("rotacaoZ");
+    const desvio = el("desvio"), turbulencia = el("turbulencia"), cd = el("cd"), area = el("area");
     let modelo = null;
-
+    const obstaculo = { ativo: false, cx: 0, cy: 0, cz: 0, hx: 1.3, hy: 1, hz: 1 };
     const loader = new STLLoader();
 
-    document
-      .getElementById("arquivoSTL")
-      .addEventListener("change", carregarSTL);
-
-    function carregarSTL(evento) {
+    el("arquivoSTL").addEventListener("change", evento => {
       const arquivo = evento.target.files[0];
-
       if (!arquivo) return;
-
       const leitor = new FileReader();
-
-      leitor.onload = function (resultado) {
-        if (modelo) {
-          scene.remove(modelo);
-          modelo.geometry.dispose();
-          modelo.material.dispose();
+      leitor.onload = resultado => {
+        try {
+          if (modelo) { scene.remove(modelo); modelo.geometry.dispose(); modelo.material.dispose(); }
+          const geometria = loader.parse(resultado.target.result);
+          geometria.computeVertexNormals();
+          geometria.center();
+          geometria.computeBoundingBox();
+          const tamanho = new THREE.Vector3();
+          geometria.boundingBox.getSize(tamanho);
+          const maiorDimensao = Math.max(tamanho.x, tamanho.y, tamanho.z);
+          if (!Number.isFinite(maiorDimensao) || maiorDimensao <= 0) throw new Error("STL sem dimensões válidas");
+          modelo = new THREE.Mesh(geometria, new THREE.MeshStandardMaterial({ color: 0xd9e4ec, metalness: 0.45, roughness: 0.35 }));
+          modelo.scale.setScalar(5 / maiorDimensao);
+          scene.add(modelo);
+          aplicarRotacao();
+          el("status").textContent = "Desvio e esteira ativados (aproximação visual).";
+        } catch (erro) {
+          obstaculo.ativo = false;
+          el("status").textContent = "Não foi possível abrir este STL.";
+          console.error(erro);
         }
-
-        const geometria = loader.parse(resultado.target.result);
-        geometria.computeVertexNormals();
-        geometria.center();
-        geometria.computeBoundingBox();
-
-        const tamanho = new THREE.Vector3();
-        geometria.boundingBox.getSize(tamanho);
-
-        const maiorDimensao = Math.max(tamanho.x, tamanho.y, tamanho.z);
-        const escala = 5 / maiorDimensao;
-
-        const material = new THREE.MeshStandardMaterial({
-          color: 0xd9e4ec,
-          metalness: 0.45,
-          roughness: 0.35
-        });
-
-        modelo = new THREE.Mesh(geometria, material);
-        modelo.scale.setScalar(escala);
-        modelo.rotation.x = -Math.PI / 2;
-
-        scene.add(modelo);
       };
-
       leitor.readAsArrayBuffer(arquivo);
+    });
+
+    function atualizarObstaculo() {
+      if (!modelo) { obstaculo.ativo = false; return; }
+      modelo.updateMatrixWorld(true);
+      const caixa = new THREE.Box3().setFromObject(modelo);
+      const centro = new THREE.Vector3(), tamanho = new THREE.Vector3();
+      caixa.getCenter(centro); caixa.getSize(tamanho);
+      obstaculo.cx = centro.x; obstaculo.cy = centro.y; obstaculo.cz = centro.z;
+      obstaculo.hx = Math.max(tamanho.x * 0.5, 0.45);
+      obstaculo.hy = Math.max(tamanho.y * 0.5, 0.35);
+      obstaculo.hz = Math.max(tamanho.z * 0.5, 0.35);
+      obstaculo.ativo = true;
     }
 
-// Linhas de fluxo do ar
-const quantidadeLinhas = 13500;
-const comprimentoRastro = 0.45;
+    function aplicarRotacao() {
+      if (!modelo) return;
+      modelo.rotation.set(-Math.PI / 2 + THREE.MathUtils.degToRad(+rotacaoX.value), THREE.MathUtils.degToRad(+rotacaoY.value), THREE.MathUtils.degToRad(+rotacaoZ.value));
+      atualizarObstaculo();
+    }
 
-const posicoesFluxo = new Float32Array(
-  quantidadeLinhas * 2 * 3
-);
+    const quantidadeLinhas = 13500;
+    const comprimentoRastro = 0.45;
+    const posicoesFluxo = new Float32Array(quantidadeLinhas * 6);
+    const baseY = new Float32Array(quantidadeLinhas), baseZ = new Float32Array(quantidadeLinhas), fases = new Float32Array(quantidadeLinhas);
+    for (let i = 0; i < quantidadeLinhas; i++) {
+      const k = i * 6, x = THREE.MathUtils.randFloat(-9, 9);
+      baseY[i] = THREE.MathUtils.randFloat(-4, 4); baseZ[i] = THREE.MathUtils.randFloat(-4, 4); fases[i] = Math.random() * Math.PI * 2;
+      posicoesFluxo[k] = x; posicoesFluxo[k + 1] = baseY[i]; posicoesFluxo[k + 2] = baseZ[i];
+      posicoesFluxo[k + 3] = x + comprimentoRastro; posicoesFluxo[k + 4] = baseY[i]; posicoesFluxo[k + 5] = baseZ[i];
+    }
+    const geometriaFluxo = new THREE.BufferGeometry();
+    geometriaFluxo.setAttribute("position", new THREE.BufferAttribute(posicoesFluxo, 3));
+    const linhasFluxo = new THREE.LineSegments(geometriaFluxo, new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false }));
+    scene.add(linhasFluxo);
 
-for (let i = 0; i < quantidadeLinhas; i++) {
-  const indice = i * 6;
-
-  const x = THREE.MathUtils.randFloat(-9, 9);
-  const y = THREE.MathUtils.randFloat(-4, 4);
-  const z = THREE.MathUtils.randFloat(-4, 4);
-
-  // Início da linha
-  posicoesFluxo[indice] = x;
-  posicoesFluxo[indice + 1] = y;
-  posicoesFluxo[indice + 2] = z;
-
-  // Final da linha
-  posicoesFluxo[indice + 3] = x + comprimentoRastro;
-  posicoesFluxo[indice + 4] = y;
-  posicoesFluxo[indice + 5] = z;
-}
-
-const geometriaFluxo = new THREE.BufferGeometry();
-
-geometriaFluxo.setAttribute(
-  "position",
-  new THREE.BufferAttribute(posicoesFluxo, 3)
-);
-
-const materialFluxo = new THREE.LineBasicMaterial({
-  color: 0x38bdf8,
-  transparent: true,
-  opacity: 0.65,
-  blending: THREE.AdditiveBlending,
-  depthWrite: false
-});
-
-const linhasFluxo = new THREE.LineSegments(
-  geometriaFluxo,
-  materialFluxo
-);
-
-scene.add(linhasFluxo);
-
-    const velocidade = document.getElementById("velocidade");
-    const rotacaoX = document.getElementById("rotacaoX");
-    const rotacaoY = document.getElementById("rotacaoY");
-    const rotacaoZ = document.getElementById("rotacaoZ");
-    const resetarRotacao = document.getElementById("resetarRotacao");
-    const cd = document.getElementById("cd");
-    const area = document.getElementById("area");
+    function pontoDoFluxo(x, y0, z0, fase, tempo) {
+      if (!obstaculo.ativo) return [y0, z0];
+      const o = obstaculo, dy = y0 - o.cy, dz = z0 - o.cz;
+      const ry = o.hy * 1.18 + 0.16, rz = o.hz * 1.18 + 0.16;
+      let ny = dy / ry, nz = dz / rz, radial = Math.hypot(ny, nz);
+      if (radial < 0.04) { ny = Math.cos(fase) * 0.04; nz = Math.sin(fase) * 0.04; radial = 0.04; }
+      const dx = x - o.cx;
+      const alcanceFrente = Math.max(o.hx * 2.5, 1.7);
+      const alcanceTras = Math.max(o.hx * 4.2, 3.3);
+      let y = y0, z = z0;
+      if (dx > -alcanceFrente && dx < o.hx * 1.25) {
+        const longitudinal = Math.exp(-Math.pow(dx / Math.max(o.hx * 1.25, 0.7), 2));
+        const proximidade = Math.max(0, 1.42 - radial) / 1.42;
+        const empurrao = longitudinal * proximidade * (+desvio.value / 100) * 1.25;
+        y += (ny / radial) * ry * empurrao;
+        z += (nz / radial) * rz * empurrao;
+      }
+      if (dx > o.hx * 0.55 && dx < alcanceTras && radial < 1.7) {
+        const decaimento = 1 - (dx - o.hx * 0.55) / (alcanceTras - o.hx * 0.55);
+        const intensidade = (+turbulencia.value / 100) * decaimento;
+        const onda = Math.sin(dx * 3.3 - tempo * 5 + fase);
+        const onda2 = Math.cos(dx * 2.4 - tempo * 4.1 + fase * 1.7);
+        y += onda * o.hy * 0.42 * intensidade;
+        z += onda2 * o.hz * 0.42 * intensidade;
+      }
+      return [y, z];
+    }
 
     function atualizarCalculos() {
-      const v = Number(velocidade.value);
-      const coeficiente = Number(cd.value);
-      const areaFrontal = Number(area.value);
-      const densidadeAr = 1.225;
-
-      const forca =
-        0.5 *
-        densidadeAr *
-        v *
-        v *
-        coeficiente *
-        areaFrontal;
-
-      document.getElementById("velocidadeValor").textContent =
-        `${v} m/s`;
-
-      document.getElementById("rotacaoXValor").textContent =
-  `${rotacaoX.value}°`;
-
-      document.getElementById("rotacaoYValor").textContent =
-  `${rotacaoY.value}°`;
-
-      document.getElementById("rotacaoZValor").textContent =
-  `${rotacaoZ.value}°`;
-
-      document.getElementById("cdValor").textContent =
-        coeficiente.toFixed(2).replace(".", ",");
-
-      document.getElementById("areaValor").textContent =
-        `${areaFrontal.toFixed(3).replace(".", ",")} m²`;
-
-      document.getElementById("forca").textContent =
-        forca.toFixed(2).replace(".", ",");
-
-      if (modelo) {
-        modelo.rotation.x =
-          -Math.PI / 2 +
-      THREE.MathUtils.degToRad(Number(rotacaoX.value));
-
-        modelo.rotation.y =
-      THREE.MathUtils.degToRad(Number(rotacaoY.value));
-
-        modelo.rotation.z =
-          THREE.MathUtils.degToRad(Number(rotacaoZ.value));
-      }
+      const v = +velocidade.value, coeficiente = +cd.value, areaFrontal = +area.value;
+      el("velocidadeValor").textContent = `${v} m/s`;
+      el("rotacaoXValor").textContent = `${rotacaoX.value}°`; el("rotacaoYValor").textContent = `${rotacaoY.value}°`; el("rotacaoZValor").textContent = `${rotacaoZ.value}°`;
+      el("desvioValor").textContent = `${desvio.value}%`; el("turbulenciaValor").textContent = `${turbulencia.value}%`;
+      el("cdValor").textContent = coeficiente.toFixed(2).replace(".", ",");
+      el("areaValor").textContent = `${areaFrontal.toFixed(3).replace(".", ",")} m²`;
+      el("forca").textContent = (0.5 * 1.225 * v * v * coeficiente * areaFrontal).toFixed(2).replace(".", ",");
+      aplicarRotacao();
     }
-
-    velocidade.addEventListener("input", atualizarCalculos);
-rotacaoX.addEventListener("input", atualizarCalculos);
-rotacaoY.addEventListener("input", atualizarCalculos);
-rotacaoZ.addEventListener("input", atualizarCalculos);
-
-resetarRotacao.addEventListener("click", function () {
-  rotacaoX.value = 0;
-  rotacaoY.value = 0;
-  rotacaoZ.value = 0;
-  atualizarCalculos();
-});
-    cd.addEventListener("input", atualizarCalculos);
-    area.addEventListener("input", atualizarCalculos);
-
+    [velocidade, rotacaoX, rotacaoY, rotacaoZ, desvio, turbulencia, cd, area].forEach(controle => controle.addEventListener("input", atualizarCalculos));
+    el("resetarRotacao").addEventListener("click", () => { rotacaoX.value = 0; rotacaoY.value = 0; rotacaoZ.value = 0; atualizarCalculos(); });
     atualizarCalculos();
 
+    const relogio = new THREE.Clock();
     function animar() {
       requestAnimationFrame(animar);
-
-const atributoFluxo =
-  geometriaFluxo.attributes.position;
-
-const velocidadeVisual =
-  Number(velocidade.value) * 0.0012;
-
-for (let i = 0; i < quantidadeLinhas; i++) {
-  const indice = i * 6;
-
-  // Move o início e o final do rastro
-  atributoFluxo.array[indice] += velocidadeVisual;
-  atributoFluxo.array[indice + 3] += velocidadeVisual;
-
-  // Quando sair do túnel, retorna ao início
-  if (atributoFluxo.array[indice] > 9) {
-    atributoFluxo.array[indice] = -9;
-    atributoFluxo.array[indice + 3] =
-      -9 + comprimentoRastro;
-
-    // Nova posição vertical e lateral
-    const novoY = THREE.MathUtils.randFloat(-4, 4);
-    const novoZ = THREE.MathUtils.randFloat(-4, 4);
-
-    atributoFluxo.array[indice + 1] = novoY;
-    atributoFluxo.array[indice + 2] = novoZ;
-    atributoFluxo.array[indice + 4] = novoY;
-    atributoFluxo.array[indice + 5] = novoZ;
-  }
-}
-
-atributoFluxo.needsUpdate = true;
-
-      controls.update();
-      renderer.render(scene, camera);
+      const tempo = relogio.getElapsedTime(), atributo = geometriaFluxo.attributes.position;
+      const passo = +velocidade.value * 0.0012;
+      for (let i = 0; i < quantidadeLinhas; i++) {
+        const k = i * 6;
+        let x1 = atributo.array[k] + passo;
+        if (x1 > 9) { x1 = -9; baseY[i] = THREE.MathUtils.randFloat(-4, 4); baseZ[i] = THREE.MathUtils.randFloat(-4, 4); fases[i] = Math.random() * Math.PI * 2; }
+        const x2 = x1 + comprimentoRastro;
+        const p1 = pontoDoFluxo(x1, baseY[i], baseZ[i], fases[i], tempo);
+        const p2 = pontoDoFluxo(x2, baseY[i], baseZ[i], fases[i], tempo);
+        atributo.array[k] = x1; atributo.array[k + 1] = p1[0]; atributo.array[k + 2] = p1[1];
+        atributo.array[k + 3] = x2; atributo.array[k + 4] = p2[0]; atributo.array[k + 5] = p2[1];
+      }
+      atributo.needsUpdate = true;
+      controls.update(); renderer.render(scene, camera);
     }
-
     animar();
-
-    window.addEventListener("resize", function () {
-      camera.aspect =
-        window.innerWidth / window.innerHeight;
-
-      camera.updateProjectionMatrix();
-
-      renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
-      );
-    });
+    addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
   </script>
 </body>
 </html>
