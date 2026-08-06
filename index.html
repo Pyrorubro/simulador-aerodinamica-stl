@@ -268,34 +268,53 @@ button:hover {
       leitor.readAsArrayBuffer(arquivo);
     }
 
-    const quantidadeParticulas = 1000;
-    const posicoes = new Float32Array(quantidadeParticulas * 3);
+// Linhas de fluxo do ar
+const quantidadeLinhas = 3500;
+const comprimentoRastro = 0.45;
 
-    for (let i = 0; i < quantidadeParticulas; i++) {
-      posicoes[i * 3] = THREE.MathUtils.randFloatSpread(18);
-      posicoes[i * 3 + 1] = THREE.MathUtils.randFloatSpread(8);
-      posicoes[i * 3 + 2] = THREE.MathUtils.randFloatSpread(8);
-    }
+const posicoesFluxo = new Float32Array(
+  quantidadeLinhas * 2 * 3
+);
 
-    const geometriaParticulas = new THREE.BufferGeometry();
-    geometriaParticulas.setAttribute(
-      "position",
-      new THREE.BufferAttribute(posicoes, 3)
-    );
+for (let i = 0; i < quantidadeLinhas; i++) {
+  const indice = i * 6;
 
-    const materialParticulas = new THREE.PointsMaterial({
-      color: 0x38bdf8,
-      size: 0.035,
-      transparent: true,
-      opacity: 0.8
-    });
+  const x = THREE.MathUtils.randFloat(-9, 9);
+  const y = THREE.MathUtils.randFloat(-4, 4);
+  const z = THREE.MathUtils.randFloat(-4, 4);
 
-    const particulas = new THREE.Points(
-      geometriaParticulas,
-      materialParticulas
-    );
+  // Início da linha
+  posicoesFluxo[indice] = x;
+  posicoesFluxo[indice + 1] = y;
+  posicoesFluxo[indice + 2] = z;
 
-    scene.add(particulas);
+  // Final da linha
+  posicoesFluxo[indice + 3] = x + comprimentoRastro;
+  posicoesFluxo[indice + 4] = y;
+  posicoesFluxo[indice + 5] = z;
+}
+
+const geometriaFluxo = new THREE.BufferGeometry();
+
+geometriaFluxo.setAttribute(
+  "position",
+  new THREE.BufferAttribute(posicoesFluxo, 3)
+);
+
+const materialFluxo = new THREE.LineBasicMaterial({
+  color: 0x38bdf8,
+  transparent: true,
+  opacity: 0.65,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+const linhasFluxo = new THREE.LineSegments(
+  geometriaFluxo,
+  materialFluxo
+);
+
+scene.add(linhasFluxo);
 
     const velocidade = document.getElementById("velocidade");
     const rotacaoX = document.getElementById("rotacaoX");
@@ -372,21 +391,37 @@ resetarRotacao.addEventListener("click", function () {
     function animar() {
       requestAnimationFrame(animar);
 
-      const atributo =
-        geometriaParticulas.attributes.position;
+const atributoFluxo =
+  geometriaFluxo.attributes.position;
 
-      const velocidadeVisual =
-        Number(velocidade.value) * 0.0007;
+const velocidadeVisual =
+  Number(velocidade.value) * 0.0012;
 
-      for (let i = 0; i < quantidadeParticulas; i++) {
-        atributo.array[i * 3] += velocidadeVisual;
+for (let i = 0; i < quantidadeLinhas; i++) {
+  const indice = i * 6;
 
-        if (atributo.array[i * 3] > 9) {
-          atributo.array[i * 3] = -9;
-        }
-      }
+  // Move o início e o final do rastro
+  atributoFluxo.array[indice] += velocidadeVisual;
+  atributoFluxo.array[indice + 3] += velocidadeVisual;
 
-      atributo.needsUpdate = true;
+  // Quando sair do túnel, retorna ao início
+  if (atributoFluxo.array[indice] > 9) {
+    atributoFluxo.array[indice] = -9;
+    atributoFluxo.array[indice + 3] =
+      -9 + comprimentoRastro;
+
+    // Nova posição vertical e lateral
+    const novoY = THREE.MathUtils.randFloat(-4, 4);
+    const novoZ = THREE.MathUtils.randFloat(-4, 4);
+
+    atributoFluxo.array[indice + 1] = novoY;
+    atributoFluxo.array[indice + 2] = novoZ;
+    atributoFluxo.array[indice + 4] = novoY;
+    atributoFluxo.array[indice + 5] = novoZ;
+  }
+}
+
+atributoFluxo.needsUpdate = true;
 
       controls.update();
       renderer.render(scene, camera);
