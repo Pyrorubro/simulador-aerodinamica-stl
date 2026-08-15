@@ -3,14 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador de Aerodinâmica STL</title>
+  <title>BAF — Bunker AeroFlux 3D</title>
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; color: white; background: #07111f; }
+    #entrada { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; overflow: hidden; padding: 24px; background: radial-gradient(circle at 50% 45%,#102f4c 0%,#07111f 48%,#030811 100%); transition: opacity .65s ease, visibility .65s ease; }
+    #entrada::before, #entrada::after { content: ""; position: absolute; inset: -25%; pointer-events: none; background: repeating-linear-gradient(96deg,transparent 0 18px,rgba(88,200,255,.16) 19px,transparent 21px 38px); transform: perspective(500px) rotateY(-18deg); animation: fluxoEntrada 7s linear infinite; }
+    #entrada::after { opacity: .35; filter: blur(2px); animation-duration: 12s; animation-direction: reverse; }
+    #entrada.oculta { opacity: 0; visibility: hidden; pointer-events: none; }
+    #marcaEntrada { position: relative; z-index: 1; width: min(620px,100%); text-align: center; }
+    #apresenta { margin-bottom: 16px; color: #8fdcff; font-size: 12px; font-weight: bold; letter-spacing: .28em; }
+    #siglaBAF { margin: 0; color: white; font-size: clamp(72px,18vw,170px); font-weight: 800; line-height: .82; letter-spacing: -.06em; text-shadow: 0 0 35px rgba(56,189,248,.38); }
+    #nomeBAF { margin: 20px 0 8px; color: #58c8ff; font-size: clamp(21px,4vw,34px); font-weight: bold; }
+    #subtituloBAF { margin: 0 auto 28px; color: #b8c8d8; font-size: clamp(13px,2.4vw,16px); }
+    #iniciarSimulacao { width: min(290px,100%); margin: 0; padding: 13px 22px; font-size: 15px; font-weight: bold; letter-spacing: .08em; background: #0f4568; box-shadow: 0 0 24px rgba(56,189,248,.18); }
+    #creditoEntrada { margin-top: 24px; color: #6f879b; font-size: 11px; letter-spacing: .08em; }
+    @keyframes fluxoEntrada { from { transform: perspective(500px) rotateY(-18deg) translateX(-8%); } to { transform: perspective(500px) rotateY(-18deg) translateX(8%); } }
     #painel { position: absolute; z-index: 10; top: 15px; left: 15px; width: 310px; max-height: calc(100vh - 30px); overflow-y: auto; padding: 18px; border: 1px solid #315574; border-radius: 12px; background: rgba(7,17,31,.92); box-shadow: 0 8px 30px rgba(0,0,0,.4); transition: width .2s ease; }
     #cabecalhoPainel { display: flex; align-items: center; gap: 10px; }
     #cabecalhoPainel h1 { flex: 1; }
-    #alternarPainel { width: auto; min-width: 42px; margin: 0; padding: 7px 10px; font-size: 18px; line-height: 1; }
+    #acoesPainel { display: flex; gap: 7px; }
+    #acoesPainel button { width: auto; min-width: 42px; margin: 0; padding: 7px 10px; font-size: 18px; line-height: 1; }
     #painel.recolhido { width: auto; overflow: hidden; padding: 10px; }
     #painel.recolhido #conteudoPainel, #painel.recolhido h1 { display: none; }
     h1 { margin: 0 0 8px; color: #58c8ff; font-size: 20px; }
@@ -30,15 +43,26 @@
     #rotulosCores { display: flex; justify-content: space-between; }
     #aviso { position: absolute; right: 15px; bottom: 15px; padding: 8px 12px; border-radius: 8px; background: rgba(0,0,0,.55); color: #c8d4df; font-size: 12px; }
     canvas { display: block; }
-    @media (max-width: 600px) { #painel { top: 8px; left: 8px; width: min(310px, calc(100vw - 16px)); max-height: calc(100dvh - 16px); padding: 14px; } #painel.recolhido { width: auto; padding: 9px; } #aviso { display: none; } }
+    @media (max-width: 600px) { #painel { top: 8px; left: 8px; width: min(310px, calc(100vw - 16px)); max-height: calc(100dvh - 16px); padding: 14px; } #painel.recolhido { width: auto; padding: 9px; } #aviso { display: none; } #entrada { padding: 18px; } }
+    @media (prefers-reduced-motion: reduce) { #entrada::before, #entrada::after { animation: none; } #entrada { transition: none; } }
   </style>
   <script type="importmap">
     {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}
   </script>
 </head>
 <body>
+  <section id="entrada" aria-label="Apresentação do BAF">
+    <div id="marcaEntrada">
+      <div id="apresenta">BUNKERDELTA APRESENTA</div>
+      <div id="siglaBAF">BAF</div>
+      <div id="nomeBAF">Bunker AeroFlux 3D</div>
+      <p id="subtituloBAF">Simulador didático de aerodinâmica para modelos tridimensionais</p>
+      <button id="iniciarSimulacao" type="button">INICIAR SIMULAÇÃO</button>
+      <div id="creditoEntrada">UM PRODUTO EDUCACIONAL BUNKERDELTA</div>
+    </div>
+  </section>
   <div id="painel">
-    <div id="cabecalhoPainel"><h1>Aerodinâmica STL</h1><button id="alternarPainel" type="button" aria-label="Recolher painel" aria-expanded="true">−</button></div>
+    <div id="cabecalhoPainel"><h1>BAF 3D</h1><div id="acoesPainel"><button id="telaCheia" type="button" aria-label="Ativar tela cheia">⛶</button><button id="alternarPainel" type="button" aria-label="Recolher painel" aria-expanded="true">−</button></div></div>
     <div id="conteudoPainel">
     <p>Carregue um STL para visualizar o desvio aproximado do ar e a esteira.</p>
     <label>Arquivo STL:<input id="arquivoSTL" type="file" accept=".stl"></label>
@@ -83,6 +107,35 @@
     scene.add(grade);
 
     const el = id => document.getElementById(id);
+
+    async function alternarTelaCheia() {
+      try {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          const sair = document.exitFullscreen || document.webkitExitFullscreen;
+          if (sair) await sair.call(document);
+        } else {
+          const entrar = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
+          if (entrar) await entrar.call(document.documentElement);
+        }
+      } catch (erro) {
+        console.info("Tela cheia não disponibilizada por este navegador.", erro);
+      }
+    }
+
+    function atualizarBotaoTelaCheia() {
+      const ativo = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+      el("telaCheia").textContent = ativo ? "↙" : "⛶";
+      el("telaCheia").setAttribute("aria-label", ativo ? "Sair da tela cheia" : "Ativar tela cheia");
+    }
+
+    el("iniciarSimulacao").addEventListener("click", async () => {
+      await alternarTelaCheia();
+      el("entrada").classList.add("oculta");
+      setTimeout(() => { el("entrada").hidden = true; }, 700);
+    });
+    el("telaCheia").addEventListener("click", alternarTelaCheia);
+    document.addEventListener("fullscreenchange", atualizarBotaoTelaCheia);
+    document.addEventListener("webkitfullscreenchange", atualizarBotaoTelaCheia);
     const velocidade = el("velocidade"), rotacaoX = el("rotacaoX"), rotacaoY = el("rotacaoY"), rotacaoZ = el("rotacaoZ");
     const rotacaoXNumero = el("rotacaoXNumero"), rotacaoYNumero = el("rotacaoYNumero"), rotacaoZNumero = el("rotacaoZNumero");
     const desvio = el("desvio"), turbulencia = el("turbulencia"), cd = el("cd"), area = el("area");
