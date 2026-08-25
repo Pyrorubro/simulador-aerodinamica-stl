@@ -39,8 +39,26 @@
     #resultado { margin-top: 15px; padding: 10px; border-radius: 8px; background: #10253a; font-size: 14px; line-height: 1.6; }
     #status { margin-top: 8px; color: #8fdcff; font-size: 12px; }
     #legendaFluxo { margin-top: 12px; color: #b8c8d8; font-size: 11px; }
+    .grupo { margin-top: 14px; padding-top: 12px; border-top: 1px solid #294761; }
+    .grupoTitulo { margin-bottom: 8px; color: #8fdcff; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: .06em; }
+    .opcoes { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; }
+    .opcoes button { margin: 0; padding: 7px 5px; font-size: 11px; }
+    .opcoes button.ativo { color: #07111f; border-color: #8fdcff; background: #58c8ff; font-weight: bold; }
+    .acoesFluxo { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px; }
+    .acoesFluxo button { margin: 0; }
+    .linhaInfo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .botaoInfo { width: 25px; min-width: 25px; height: 25px; margin: 0; padding: 0; border-radius: 50%; font-weight: bold; }
+    .checkLinha { display: flex; align-items: center; gap: 8px; margin-top: 10px; cursor: pointer; }
+    .checkLinha input { accent-color: #58c8ff; }
+    #legendaPressao { display: none; margin-top: 7px; color: #b8c8d8; font-size: 11px; }
+    #legendaPressao.visivel { display: block; }
+    #barraPressao { height: 9px; margin: 5px 0 3px; border-radius: 5px; background: linear-gradient(90deg,#2563eb,#22d3ee,#22c55e,#facc15,#ef4444); }
+    dialog { width: min(460px,calc(100vw - 30px)); border: 1px solid #58c8ff; border-radius: 12px; padding: 20px; color: white; background: #07111f; box-shadow: 0 15px 55px #000; }
+    dialog::backdrop { background: rgba(0,0,0,.72); }
+    dialog h2 { margin: 0 0 12px; color: #58c8ff; font-size: 20px; }
+    dialog button { margin-bottom: 0; }
     #barraCores { height: 9px; margin: 5px 0 3px; border-radius: 5px; background: linear-gradient(90deg,#38bdf8 0%,#22c55e 35%,#facc15 65%,#f97316 82%,#ef4444 100%); }
-    #rotulosCores { display: flex; justify-content: space-between; }
+    #rotulosCores, .rotulosCores { display: flex; justify-content: space-between; }
     #aviso { position: absolute; right: 15px; bottom: 15px; padding: 8px 12px; border-radius: 8px; background: rgba(0,0,0,.55); color: #c8d4df; font-size: 12px; }
     canvas { display: block; }
     @media (max-width: 600px) { #painel { top: 8px; left: 8px; width: min(310px, calc(100vw - 16px)); max-height: calc(100dvh - 16px); padding: 14px; } #painel.recolhido { width: auto; padding: 9px; } #aviso { display: none; } #entrada { padding: 18px; } }
@@ -73,6 +91,10 @@
     <button id="resetarRotacao" type="button">Centralizar rotação</button>
     <label>Desvio do fluxo: <span id="desvioValor" class="valor">100%</span><input id="desvio" type="range" min="0" max="180" value="100"></label>
     <label>Turbulência da esteira: <span id="turbulenciaValor" class="valor">35%</span><input id="turbulencia" type="range" min="0" max="100" value="35"></label>
+    <div class="grupo"><div class="grupoTitulo">Visualização</div><div id="modosVisualizacao" class="opcoes"><button data-modo="rastros" class="ativo" type="button">Rastros</button><button data-modo="pontos" type="button">Pontos</button><button data-modo="misto" type="button">Misto</button><button data-modo="continuas" type="button">Linhas contínuas</button></div></div>
+    <div class="grupo"><div class="grupoTitulo">Desempenho</div><div id="modosDesempenho" class="opcoes"><button data-quantidade="3000" type="button">Leve · 3.000</button><button data-quantidade="7000" type="button">Médio · 7.000</button><button data-quantidade="13500" class="ativo" type="button">Alto · 13.500</button></div><div class="acoesFluxo"><button id="pausarFluxo" type="button">Pausar</button><button id="reiniciarFluxo" type="button">Reiniciar fluxo</button></div></div>
+    <div class="grupo"><div class="grupoTitulo linhaInfo"><span>Número de Reynolds</span><button id="infoReynolds" class="botaoInfo" type="button" aria-label="Explicação sobre Reynolds">i</button></div><label>Comprimento característico: <span id="comprimentoValor" class="valor">1,00 m</span><input id="comprimento" type="range" min="0.01" max="10" value="1" step="0.01"></label><div id="reynoldsResultado">Reynolds: <strong><span id="reynolds">1.333.333</span></strong></div></div>
+    <div class="grupo"><div class="grupoTitulo">Superfície do modelo</div><label class="checkLinha"><input id="pressaoEstimada" type="checkbox"> Mostrar pressão relativa estimada</label><div id="legendaPressao"><div id="barraPressao"></div><div class="rotulosCores"><span>baixa</span><span>alta</span></div><div>Representação qualitativa — não é CFD.</div></div><button id="capturarImagem" type="button">Capturar imagem</button></div>
     <label>Coeficiente de arrasto: <span id="cdValor" class="valor">0,50</span><input id="cd" type="range" min="0.05" max="2" value="0.5" step="0.05"></label>
     <label>Área frontal: <span id="areaValor" class="valor">0,010 m²</span><input id="area" type="range" min="0.001" max="0.2" value="0.01" step="0.001"></label>
     <div id="resultado">Força de arrasto: <strong><span id="forca">1,23</span> N</strong><div id="status">Fluxo uniforme — carregue um STL.</div></div>
@@ -80,6 +102,7 @@
     </div>
   </div>
   <div id="aviso">Arraste para girar a câmera • Role para aproximar</div>
+  <dialog id="dialogoReynolds"><h2>Número de Reynolds</h2><p>Compara os efeitos da inércia e da viscosidade no escoamento. Ele depende da velocidade do ar, do comprimento característico do objeto e da viscosidade do fluido.</p><p>O BAF utiliza ar a aproximadamente 20 °C (ν ≈ 1,5 × 10⁻⁵ m²/s). O resultado serve para comparação didática; não existe um único limite universal entre escoamento laminar e turbulento para todas as geometrias.</p><button id="fecharReynolds" type="button">Entendi</button></dialog>
   <script type="module">
     import * as THREE from "three";
     import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -89,7 +112,7 @@
     scene.background = new THREE.Color(0x07111f);
     const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 1000);
     camera.position.set(8, 5, 9);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     renderer.setSize(innerWidth, innerHeight);
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     document.body.appendChild(renderer.domElement);
@@ -138,8 +161,9 @@
     document.addEventListener("webkitfullscreenchange", atualizarBotaoTelaCheia);
     const velocidade = el("velocidade"), rotacaoX = el("rotacaoX"), rotacaoY = el("rotacaoY"), rotacaoZ = el("rotacaoZ");
     const rotacaoXNumero = el("rotacaoXNumero"), rotacaoYNumero = el("rotacaoYNumero"), rotacaoZNumero = el("rotacaoZNumero");
-    const desvio = el("desvio"), turbulencia = el("turbulencia"), cd = el("cd"), area = el("area");
+    const desvio = el("desvio"), turbulencia = el("turbulencia"), cd = el("cd"), area = el("area"), comprimento = el("comprimento");
     let modelo = null;
+    let modoVisualizacao = "rastros", quantidadeAtiva = 13500, fluxoPausado = false;
     const obstaculo = { ativo: false, cx: 0, cy: 0, cz: 0, hx: 1.3, hy: 1, hz: 1 };
     const loader = new STLLoader();
 
@@ -158,10 +182,14 @@
           geometria.boundingBox.getSize(tamanho);
           const maiorDimensao = Math.max(tamanho.x, tamanho.y, tamanho.z);
           if (!Number.isFinite(maiorDimensao) || maiorDimensao <= 0) throw new Error("STL sem dimensões válidas");
-          modelo = new THREE.Mesh(geometria, new THREE.MeshStandardMaterial({ color: 0xd9e4ec, metalness: 0.45, roughness: 0.35 }));
+          const coresModelo = new Float32Array(geometria.attributes.position.count * 3);
+          coresModelo.fill(1);
+          geometria.setAttribute("color", new THREE.BufferAttribute(coresModelo, 3));
+          modelo = new THREE.Mesh(geometria, new THREE.MeshStandardMaterial({ color: 0xd9e4ec, metalness: 0.45, roughness: 0.35, vertexColors: false }));
           modelo.scale.setScalar(5 / maiorDimensao);
           scene.add(modelo);
           aplicarRotacao();
+          atualizarPressaoEstimada();
           el("status").textContent = "Desvio e esteira ativados (aproximação visual).";
         } catch (erro) {
           obstaculo.ativo = false;
@@ -208,6 +236,30 @@
     geometriaFluxo.setAttribute("color", new THREE.BufferAttribute(coresFluxo, 3));
     const linhasFluxo = new THREE.LineSegments(geometriaFluxo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.68, blending: THREE.AdditiveBlending, depthWrite: false }));
     scene.add(linhasFluxo);
+    geometriaFluxo.setDrawRange(0, quantidadeAtiva * 2);
+
+    const posicoesPontos = new Float32Array(quantidadeLinhas * 3);
+    const coresPontos = new Float32Array(quantidadeLinhas * 3);
+    const geometriaPontos = new THREE.BufferGeometry();
+    geometriaPontos.setAttribute("position", new THREE.BufferAttribute(posicoesPontos, 3));
+    geometriaPontos.setAttribute("color", new THREE.BufferAttribute(coresPontos, 3));
+    geometriaPontos.setDrawRange(0, quantidadeAtiva);
+    const pontosFluxo = new THREE.Points(geometriaPontos, new THREE.PointsMaterial({ size: .055, vertexColors: true, transparent: true, opacity: .82, blending: THREE.AdditiveBlending, depthWrite: false }));
+    pontosFluxo.visible = false;
+    scene.add(pontosFluxo);
+
+    const linhasContinuas = [];
+    const totalContinuas = 24, amostrasContinuas = 100;
+    for (let i = 0; i < totalContinuas; i++) {
+      const geometria = new THREE.BufferGeometry();
+      geometria.setAttribute("position", new THREE.BufferAttribute(new Float32Array(amostrasContinuas * 3), 3));
+      const linha = new THREE.Line(geometria, new THREE.LineBasicMaterial({ color: 0x8fdcff, transparent: true, opacity: .82, blending: THREE.AdditiveBlending, depthWrite: false }));
+      linha.userData.y0 = -3.5 + (i % 8) * 1;
+      linha.userData.z0 = -2.4 + Math.floor(i / 8) * 2.4;
+      linha.userData.fase = i * .73;
+      linha.visible = false;
+      linhasContinuas.push(linha); scene.add(linha);
+    }
 
     function pontoDoFluxo(x, y0, z0, fase, tempo) {
       if (!obstaculo.ativo) return [y0, z0, 0];
@@ -248,6 +300,33 @@
       array[indice] = corTemp.r; array[indice + 1] = corTemp.g; array[indice + 2] = corTemp.b;
     }
 
+    function atualizarVisibilidade() {
+      linhasFluxo.visible = modoVisualizacao === "rastros" || modoVisualizacao === "misto";
+      pontosFluxo.visible = modoVisualizacao === "pontos" || modoVisualizacao === "misto";
+      linhasContinuas.forEach(linha => linha.visible = modoVisualizacao === "continuas");
+    }
+
+    function atualizarPressaoEstimada() {
+      if (!modelo) return;
+      const ativa = el("pressaoEstimada").checked;
+      modelo.material.vertexColors = ativa;
+      modelo.material.color.set(ativa ? 0xffffff : 0xd9e4ec);
+      if (ativa) {
+        const normais = modelo.geometry.attributes.normal;
+        const cores = modelo.geometry.attributes.color;
+        const normal = new THREE.Vector3();
+        const matrizNormal = new THREE.Matrix3().getNormalMatrix(modelo.matrixWorld);
+        for (let i = 0; i < normais.count; i++) {
+          normal.fromBufferAttribute(normais, i).applyMatrix3(matrizNormal).normalize();
+          const impacto = THREE.MathUtils.clamp((-normal.x + 1) * .5, 0, 1);
+          definirCor(cores.array, i * 3, impacto);
+        }
+        cores.needsUpdate = true;
+      }
+      modelo.material.needsUpdate = true;
+      el("legendaPressao").classList.toggle("visivel", ativa);
+    }
+
     function atualizarCalculos() {
       const v = +velocidade.value, coeficiente = +cd.value, areaFrontal = +area.value;
       el("velocidadeValor").textContent = `${v} m/s`;
@@ -256,9 +335,13 @@
       el("cdValor").textContent = coeficiente.toFixed(2).replace(".", ",");
       el("areaValor").textContent = `${areaFrontal.toFixed(3).replace(".", ",")} m²`;
       el("forca").textContent = (0.5 * 1.225 * v * v * coeficiente * areaFrontal).toFixed(2).replace(".", ",");
+      const L = +comprimento.value, reynolds = v * L / 1.5e-5;
+      el("comprimentoValor").textContent = `${L.toFixed(2).replace(".", ",")} m`;
+      el("reynolds").textContent = Math.round(reynolds).toLocaleString("pt-BR");
       aplicarRotacao();
+      atualizarPressaoEstimada();
     }
-    [velocidade, rotacaoX, rotacaoY, rotacaoZ, desvio, turbulencia, cd, area].forEach(controle => controle.addEventListener("input", atualizarCalculos));
+    [velocidade, rotacaoX, rotacaoY, rotacaoZ, desvio, turbulencia, cd, area, comprimento].forEach(controle => controle.addEventListener("input", atualizarCalculos));
     [[rotacaoX, rotacaoXNumero], [rotacaoY, rotacaoYNumero], [rotacaoZ, rotacaoZNumero]].forEach(([barra, campo]) => {
       barra.addEventListener("input", () => { campo.value = barra.value; });
       const aplicarCampo = () => { if (campo.value === "") return; const valor = THREE.MathUtils.clamp(Math.round(Number(campo.value) || 0), -180, 180); campo.value = valor; barra.value = valor; atualizarCalculos(); };
@@ -266,6 +349,16 @@
     });
     el("alternarPainel").addEventListener("click", () => { const recolhido = el("painel").classList.toggle("recolhido"); const botao = el("alternarPainel"); botao.textContent = recolhido ? "+" : "−"; botao.setAttribute("aria-label", recolhido ? "Abrir painel" : "Recolher painel"); botao.setAttribute("aria-expanded", String(!recolhido)); });
     el("resetarRotacao").addEventListener("click", () => { rotacaoX.value = rotacaoY.value = rotacaoZ.value = 0; rotacaoXNumero.value = rotacaoYNumero.value = rotacaoZNumero.value = 0; atualizarCalculos(); });
+    el("modosVisualizacao").addEventListener("click", evento => { const botao = evento.target.closest("button[data-modo]"); if (!botao) return; modoVisualizacao = botao.dataset.modo; el("modosVisualizacao").querySelectorAll("button").forEach(b => b.classList.toggle("ativo", b === botao)); atualizarVisibilidade(); });
+    el("modosDesempenho").addEventListener("click", evento => { const botao = evento.target.closest("button[data-quantidade]"); if (!botao) return; quantidadeAtiva = +botao.dataset.quantidade; geometriaFluxo.setDrawRange(0, quantidadeAtiva * 2); geometriaPontos.setDrawRange(0, quantidadeAtiva); el("modosDesempenho").querySelectorAll("button").forEach(b => b.classList.toggle("ativo", b === botao)); });
+    el("pausarFluxo").addEventListener("click", () => { fluxoPausado = !fluxoPausado; el("pausarFluxo").textContent = fluxoPausado ? "Continuar" : "Pausar"; });
+    function reiniciarFluxo() { for (let i = 0; i < quantidadeLinhas; i++) { const k = i * 6, x = THREE.MathUtils.randFloat(-9, 9); baseY[i] = THREE.MathUtils.randFloat(-4, 4); baseZ[i] = THREE.MathUtils.randFloat(-4, 4); fases[i] = Math.random() * Math.PI * 2; posicoesFluxo[k] = x; posicoesFluxo[k + 3] = x + comprimentoRastro; } geometriaFluxo.attributes.position.needsUpdate = true; }
+    el("reiniciarFluxo").addEventListener("click", reiniciarFluxo);
+    el("pressaoEstimada").addEventListener("change", atualizarPressaoEstimada);
+    el("infoReynolds").addEventListener("click", () => el("dialogoReynolds").showModal());
+    el("fecharReynolds").addEventListener("click", () => el("dialogoReynolds").close());
+    el("capturarImagem").addEventListener("click", () => { renderer.render(scene, camera); const link = document.createElement("a"); link.download = `BAF-captura-${Date.now()}.png`; link.href = renderer.domElement.toDataURL("image/png"); link.click(); });
+    atualizarVisibilidade();
     atualizarCalculos();
 
     const relogio = new THREE.Clock();
@@ -273,7 +366,7 @@
       requestAnimationFrame(animar);
       const tempo = relogio.getElapsedTime(), atributo = geometriaFluxo.attributes.position, atributoCor = geometriaFluxo.attributes.color;
       const passo = +velocidade.value * 0.0012;
-      for (let i = 0; i < quantidadeLinhas; i++) {
+      if (!fluxoPausado) for (let i = 0; i < quantidadeAtiva; i++) {
         const k = i * 6;
         let x1 = atributo.array[k] + passo;
         if (x1 > 9) { x1 = -9; baseY[i] = THREE.MathUtils.randFloat(-4, 4); baseZ[i] = THREE.MathUtils.randFloat(-4, 4); fases[i] = Math.random() * Math.PI * 2; }
@@ -283,9 +376,23 @@
         atributo.array[k] = x1; atributo.array[k + 1] = p1[0]; atributo.array[k + 2] = p1[1];
         atributo.array[k + 3] = x2; atributo.array[k + 4] = p2[0]; atributo.array[k + 5] = p2[1];
         definirCor(atributoCor.array, k, p1[2]); definirCor(atributoCor.array, k + 3, p2[2]);
+        const p = i * 3;
+        posicoesPontos[p] = x1; posicoesPontos[p + 1] = p1[0]; posicoesPontos[p + 2] = p1[1];
+        coresPontos[p] = atributoCor.array[k]; coresPontos[p + 1] = atributoCor.array[k + 1]; coresPontos[p + 2] = atributoCor.array[k + 2];
       }
       atributo.needsUpdate = true;
       atributoCor.needsUpdate = true;
+      geometriaPontos.attributes.position.needsUpdate = true;
+      geometriaPontos.attributes.color.needsUpdate = true;
+      if (!fluxoPausado && modoVisualizacao === "continuas") linhasContinuas.forEach(linha => {
+        const array = linha.geometry.attributes.position.array;
+        for (let j = 0; j < amostrasContinuas; j++) {
+          const x = -9 + j * 18 / (amostrasContinuas - 1);
+          const p = pontoDoFluxo(x, linha.userData.y0, linha.userData.z0, linha.userData.fase, tempo);
+          const k = j * 3; array[k] = x; array[k + 1] = p[0]; array[k + 2] = p[1];
+        }
+        linha.geometry.attributes.position.needsUpdate = true;
+      });
       controls.update(); renderer.render(scene, camera);
     }
     animar();
